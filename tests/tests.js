@@ -1,5 +1,14 @@
-var log = require('../log.js'),
-    lastWrite = '';
+var util = require('util'),
+    lastWrite = '',
+    log;
+
+util.debuglog = function(name) {
+    return function(level, string) {
+        lastWrite = [name, level, string].join(':');
+    };
+};
+
+log = require('../log.js')('modulelog');
 
 exports.discard = function(test) {
     var oldLog = console.log;
@@ -49,4 +58,13 @@ exports.require = function(test) {
     test.done();
 };
 
-//todo: test debug
+exports.debug = function(test) {
+    log.setClass('debuglog');
+    log.warn('testDebug1');
+    test.equal(lastWrite, 'modulelog:WARN::testDebug1');
+
+    var log2 = log.new('modulelog2');
+    log2.debug('testDebug2');
+    test.equal(lastWrite, 'modulelog2:DEBUG::testDebug2');
+    test.done();
+};

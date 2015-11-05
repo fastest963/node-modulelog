@@ -10,7 +10,7 @@ except that no `debug` methods will be logged.
 ### Usage ###
 
 ```JS
-var log = require('modulelog');
+var log = require('modulelog')('mymodulename');
 log.setClass('console');
 function cb(err) {
     log.error("An error occured", {error: err});
@@ -21,7 +21,7 @@ A common use case would be to use [flags](https://www.npmjs.com/package/flags)
 and allow the user to pass the class name via `--logger`:
 
 ```JS
-var log = require('modulelog'),
+var log = require('modulelog')('mymodulename'),
     flags = require('flags');
 flags.defineString('logger', 'debug', 'Your name');
 flags.parse();
@@ -29,6 +29,11 @@ log.setClass(flags.get('logger'));
 ```
 
 ## Methods ##
+
+Note: you **must** pass your module/app name to the result of
+`require('modulelog')` in order to get an instance to log with. The actual
+class and level is globally controlled across modules but each module
+must have a name for the `debuglog` prefix.
 
 ### log.setClass(name) ###
 
