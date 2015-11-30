@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.2.1 ###
+* Fixed bug where multiple modules would get different instances of Logger
+
 ### 0.2.0 ###
 * Stable Release
 

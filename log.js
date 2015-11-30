@@ -38,7 +38,28 @@ function Logger(logClass) {
     this.level = '';
 }
 
-Logger.instance = new Logger(DiscardLogger);
+// this is pretty ghetto but we want to make sure that every module has the
+// same instance
+function setInstance(inst) {
+    if (typeof global !== 'undefined') {
+        global.MODULELOG_INST = inst;
+    } else {
+        MODULELOG_INST = inst;
+    }
+}
+function getInstance() {
+    var inst;
+    if (typeof global !== 'undefined') {
+        inst = global.MODULELOG_INST;
+    } else if (typeof MODULELOG_INST == 'undefined') {
+        inst = MODULELOG_INST;
+    }
+    if (!inst) {
+        inst = new Logger(DiscardLogger);
+        setInstance(inst);
+    }
+    return inst;
+}
 
 Logger.prototype.log = function(ctx, type, args) {
     //allow ctx to be optional
@@ -94,41 +115,41 @@ ModuleLogger.prototype.setClass = function(name) {
     if (typeof inst === 'function' && inst.info === undefined && inst.error === undefined) {
         inst = new inst();
     }
-    var oldInstance = Logger.instance;
-    Logger.instance = new Logger(inst);
+    var oldInstance = getInstance();
+    setInstance(new Logger(inst));
     //if they changed the log level then keep that same level
     if (oldInstance.level !== '') {
-        Logger.instance.setLevel(oldInstance.level);
+        getInstance().setLevel(oldInstance.level);
     }
 };
 
 ModuleLogger.prototype.setLevel = function(level) {
-    Logger.instance.setLevel(level);
+    getInstance().setLevel(level);
 };
 
 ModuleLogger.prototype.debug = function() {
-    Logger.instance.log(this, 'debug', Array.prototype.slice.call(arguments));
+    getInstance().log(this, 'debug', Array.prototype.slice.call(arguments));
 };
 
 ModuleLogger.prototype.info = ModuleLogger.prototype.log = function() {
-    if (!Logger.instance.log(this, 'info', Array.prototype.slice.call(arguments))) {
-        Logger.instance.log(this, 'log', Array.prototype.slice.call(arguments));
+    if (!getInstance().log(this, 'info', Array.prototype.slice.call(arguments))) {
+        getInstance().log(this, 'log', Array.prototype.slice.call(arguments));
     }
 };
 
 ModuleLogger.prototype.warn = function() {
-    Logger.instance.log(this, 'warn', Array.prototype.slice.call(arguments));
+    getInstance().log(this, 'warn', Array.prototype.slice.call(arguments));
 };
 
 ModuleLogger.prototype.error = function() {
-    Logger.instance.log(this, 'error', Array.prototype.slice.call(arguments));
+    getInstance().log(this, 'error', Array.prototype.slice.call(arguments));
 };
 
 ModuleLogger.prototype.fatal = function() {
-    if (!Logger.instance.log(this, 'fatal', Array.prototype.slice.call(arguments))) {
-        Logger.instance.log(this, 'error', Array.prototype.slice.call(arguments));
+    if (!getInstance().log(this, 'fatal', Array.prototype.slice.call(arguments))) {
+        getInstance().log(this, 'error', Array.prototype.slice.call(arguments));
     }
-    Logger.instance.exit();
+    getInstance().exit();
 };
 
 ModuleLogger.prototype.new = function(name) {

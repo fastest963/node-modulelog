@@ -1,6 +1,14 @@
 var util = require('util'),
+    requireReload = require('require-reload')(require),
+    LLog = require('levenlabs-log'),
     lastWrite = '',
-    log;
+    log, logNew;
+
+LLog.instance = new LLog('info', {
+    write: function(str) {
+        lastWrite = str;
+    }
+});
 
 util.debuglog = function(name) {
     return function(level, string) {
@@ -9,6 +17,7 @@ util.debuglog = function(name) {
 };
 
 log = require('../log.js')('modulelog');
+logNew = requireReload('../log.js')('modulelog');
 
 exports.discard = function(test) {
     var oldLog = console.log;
@@ -41,12 +50,6 @@ exports.console = function(test) {
 };
 
 exports.require = function(test) {
-    var llog = require('levenlabs-log');
-    llog.instance = new llog('info', {
-        write: function(str) {
-            lastWrite = str;
-        }
-    });
     log.setClass('levenlabs-log');
     log.warn('testLLog1');
     test.ok(lastWrite.indexOf('testLLog1') > -1);
@@ -66,5 +69,17 @@ exports.debug = function(test) {
     var log2 = log.new('modulelog2');
     log2.debug('testDebug2');
     test.equal(lastWrite, 'modulelog2:DEBUG::testDebug2');
+    test.done();
+};
+
+exports.acrossModules = function(test) {
+    log.setClass('levenlabs-log');
+    lastWrite = '';
+    logNew.setLevel('error');
+    log.warn('testDebug1');
+    test.equal(lastWrite, '');
+    logNew.setLevel('warn');
+    log.warn('testDebug1');
+    test.notEqual(lastWrite, '');
     test.done();
 };
