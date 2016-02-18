@@ -1,6 +1,6 @@
 {
   "name": "modulelog",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Library to allow easy userland-changeable logging for node modules/applications",
   "main": "log.js",
   "directories": {
