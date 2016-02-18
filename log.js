@@ -6,6 +6,11 @@ var util = require('util'),
         debug: noop,
         warn: noop,
         error: noop
+    },
+    DebugLogger = {
+        getLoggerForContext: function(ctx) {
+            return debugContexts.get(ctx);
+        }
     };
 
 function wrapDebug(debug) {
@@ -14,20 +19,12 @@ function wrapDebug(debug) {
             debug.apply(null, [prefix].concat(Array.prototype.slice.call(arguments)));
         };
     };
-    var newDebug = {
+    return {
         info: callDebug('LOG:'),
         debug: callDebug('DEBUG:'),
         warn: callDebug('WARN:'),
         error: callDebug('ERROR:')
     };
-    newDebug.getLoggerForContext = function(ctx) {
-        var backer = debugContexts.get(ctx);
-        if (!backer) {
-            backer = newDebug;
-        }
-        return backer;
-    };
-    return newDebug;
 }
 
 function Logger(logClass) {
@@ -67,12 +64,12 @@ Logger.prototype.log = function(ctx, type, args) {
         args = type;
         type = ctx;
     }
-    if (this.backer[type] === undefined) {
-        return false;
-    }
     var backer = this.backer;
     if (typeof backer.getLoggerForContext === 'function') {
         backer = backer.getLoggerForContext(ctx);
+    }
+    if (!backer || backer[type] === undefined) {
+        return false;
     }
     backer[type].apply(this.backer, args);
     return true;
@@ -100,12 +97,12 @@ function ModuleLogger(name) {
     debugContexts.set(this, wrapDebug(util.debuglog(name)));
 }
 
-ModuleLogger.prototype.setClass = function(name) {
+ModuleLogger.setClass = ModuleLogger.prototype.setClass = function(name) {
     var inst = DiscardLogger;
     if (name === 'console') {
         inst = console;
     } else if (name === 'default' || name === 'debuglog' || name === undefined) {
-        inst = wrapDebug(util.debuglog(this.name));
+        inst = DebugLogger;
     } else if (typeof name === 'object' || typeof name === 'function') {
         inst = name;
     } else if (name !== '' && name !== 'discard') {
@@ -123,7 +120,7 @@ ModuleLogger.prototype.setClass = function(name) {
     }
 };
 
-ModuleLogger.prototype.setLevel = function(level) {
+ModuleLogger.setLevel = ModuleLogger.prototype.setLevel = function(level) {
     getInstance().setLevel(level);
 };
 

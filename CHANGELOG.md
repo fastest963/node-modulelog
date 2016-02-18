@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.2.2 ###
+* Added `setClass` and `setLevel` static methods
+
 ### 0.2.1 ###
 * Fixed bug where multiple modules would get different instances of Logger
 

@@ -60,3 +60,8 @@ of arguments are accepted and passed on.
 Calls the corresponding method on the backing library. If the library has no
 `fatal` method, then `error` is called instead. After logging, `process.exit`
 is invoked.
+
+## Static Methods ##
+
+If you're trying to set the level or class in a static fashion `setLevel` and
+`setClass` are both exposed statically on the exports for the module.
