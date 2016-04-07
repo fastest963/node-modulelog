@@ -2,13 +2,17 @@ var util = require('util'),
     LLog = require('levenlabs-log'),
     Log = require('../log.js'),
     lastWrite = '',
+    llogOptions = {
+        level: 'info',
+        stdout: {
+            write: function(str) {
+                lastWrite = str;
+            }
+        }
+    },
     log, logNew;
 
-LLog.instance = new LLog('info', {
-    write: function(str) {
-        lastWrite = str;
-    }
-});
+LLog.instance = new LLog(llogOptions);
 
 util.debuglog = function(name) {
     return function(level, string) {

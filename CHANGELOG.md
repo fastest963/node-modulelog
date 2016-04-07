@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.2.3 ###
+* Added options to `setClass`
+
 ### 0.2.2 ###
 * Added `setClass` and `setLevel` static methods
 

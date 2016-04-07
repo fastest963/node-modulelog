@@ -97,7 +97,7 @@ function ModuleLogger(name) {
     debugContexts.set(this, wrapDebug(util.debuglog(name)));
 }
 
-ModuleLogger.setClass = ModuleLogger.prototype.setClass = function(name) {
+ModuleLogger.setClass = ModuleLogger.prototype.setClass = function(name, options) {
     var inst = DiscardLogger;
     if (name === 'console') {
         inst = console;
@@ -109,9 +109,13 @@ ModuleLogger.setClass = ModuleLogger.prototype.setClass = function(name) {
         inst = require(name);
     }
     //see if its a class that we have to instantiate
-    if (typeof inst === 'function' && inst.info === undefined && inst.error === undefined) {
-        inst = new inst();
+    if (typeof inst === 'function' && (typeof inst.prototype.info === 'function' || typeof inst.prototype.warn === 'function')) {
+        inst = new inst(options);
     }
+    if (typeof inst.info !== 'function' && typeof inst.warn !== 'function' && typeof inst.getLoggerForContext !== 'function') {
+        throw new Error('Invalid class ' + name + ' passed. Does not seem to support info or warn');
+    }
+
     var oldInstance = getInstance();
     setInstance(new Logger(inst));
     //if they changed the log level then keep that same level

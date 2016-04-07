@@ -35,11 +35,12 @@ Note: you **must** pass your module/app name to the result of
 class and level is globally controlled across modules but each module
 must have a name for the `debuglog` prefix.
 
-### log.setClass(name) ###
+### log.setClass(name[, options]) ###
 
 Change the default logging library to be `name`. Built-in values are `default`,
 `debuglog`, `console`. If an empty string is passed in, all logs will be
-discarded. Any non-built-in values will be passed to `require`.
+discarded. Any non-built-in values will be passed to `require`. `options` will
+be passed to the constructor when the module was required.
 
 ### log.setLevel(level) ###
 
