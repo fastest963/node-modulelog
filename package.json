@@ -11,8 +11,7 @@
   },
   "devDependencies": {
     "levenlabs-log": "*",
-    "nodeunit": "^0.9.1",
-    "require-reload": "^0.2.2"
+    "nodeunit": "^0.9.1"
   },
   "repository": {
     "type": "git",

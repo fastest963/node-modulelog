@@ -1,5 +1,4 @@
 var util = require('util'),
-    requireReload = require('require-reload')(require),
     LLog = require('levenlabs-log'),
     Log = require('../log.js'),
     lastWrite = '',
